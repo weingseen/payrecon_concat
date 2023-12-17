@@ -60,12 +60,28 @@ def save_to_csv(all_filtered, base_directory):
     # Save the filtered data to the CSV file in the "Results" folder
     filtered_data.to_csv(csv_file_name, index=False,header=False, encoding="utf-8")
 
+def combine_sku_and_quantity(all_filtered):
+    sku_quantity_dict = {}  # Create a dictionary to store SKU and cumulative quantity
+
+    for index, row in all_filtered.iterrows():
+        sku = row['SKU']
+        quantity = row['Quantity']
+        
+        if sku in sku_quantity_dict:
+            sku_quantity_dict[sku] += quantity
+        else:
+            sku_quantity_dict[sku] = quantity
+
+    # Update the SKU and Quantity columns with combined values
+    all_filtered['SKU'] = all_filtered['SKU'] + '-' + all_filtered['SKU'].map(sku_quantity_dict).astype(str)
+    all_filtered['Quantity'] = all_filtered['SKU'].map(sku_quantity_dict)
+
 def main():
     base_directory = get_base_directory()
     all_filtered = combine_xlsx_files_and_cleanup(base_directory)
     create_postcode_column(all_filtered)
+    combine_sku_and_quantity(all_filtered)  # Call the function to combine SKU and Quantity
     save_to_csv(all_filtered, base_directory)
 
 if __name__ == "__main__":
     main()
-
