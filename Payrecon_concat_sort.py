@@ -61,20 +61,33 @@ def save_to_csv(all_filtered, base_directory):
     filtered_data.to_csv(csv_file_name, index=False,header=False, encoding="utf-8")
 
 def combine_sku_and_quantity(all_filtered):
-    sku_values = all_filtered['SKU'].split(',')
-    quantity_values = all_filtered['Quantity'].split(',')
+    # Create empty lists to store the combined SKU and Quantity strings
+    combined_sku_values = []
+    combined_quantity_values = []
 
-    # Create an empty dictionary to store the SKU and Quantity pairs
-    sku_quantity_dict = {}
+    # Iterate through each row in the DataFrame
+    for index, row in all_filtered.iterrows():
+        sku_values = row['SKU'].split(',')
+        quantity_values = row['Quantity'].split(',')
 
-    # Iterate through the indices and combine SKU and Quantity
-    for index in range(len(sku_values)):
-        sku = sku_values[index].strip()  # Remove leading/trailing spaces
-        quantity = int(quantity_values[index].strip())  # Convert quantity to an integer
-        sku_quantity_dict[sku] = quantity  
+        # Create an empty dictionary to store the SKU and Quantity pairs for the current row
+        sku_quantity_dict = {}
 
-    all_filtered["SKU"] = ",".join([f"{key}-{value}" for key, value in sku_quantity_dict.items()])
-    all_filtered["Quantity"] = ",".join(map(str, sku_quantity_dict.values()))
+        # Iterate through the indices and combine SKU and Quantity for the current row
+        for i in range(len(sku_values)):
+            sku = sku_values[i].strip()  # Remove leading/trailing spaces
+            quantity = int(quantity_values[i].strip())  # Convert quantity to an integer
+            sku_quantity_dict[sku] = quantity
+
+        # Join SKU and Quantity for the current row and append to the lists
+        combined_sku = ",".join([f"{key}-{value}" for key, value in sku_quantity_dict.items()])
+        combined_quantity = ",".join(map(str, sku_quantity_dict.values()))
+        combined_sku_values.append(combined_sku)
+        combined_quantity_values.append(combined_quantity)
+
+    # Update the DataFrame with the combined SKU and Quantity values
+    all_filtered['SKU'] = combined_sku_values
+    all_filtered['Quantity'] = combined_quantity_values
 
 
 def main():
