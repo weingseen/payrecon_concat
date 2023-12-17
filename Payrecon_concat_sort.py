@@ -77,7 +77,7 @@ def combine_sku_and_quantity(all_filtered):
         for i in range(len(sku_values)):
             sku = sku_values[i].strip()  # Remove leading/trailing spaces
             quantity = int(quantity_values[i].strip())  # Convert quantity to an integer
-            sku_quantity_dict[sku] = quantity
+            sku_quantity_dict[sku] =   sku_quantity_dict.get(sku, 0) + quantity
 
         # Join SKU and Quantity for the current row and append to the lists
         combined_sku = ",".join([f"{key}-{value}" for key, value in sku_quantity_dict.items()])
