@@ -60,6 +60,9 @@ def save_to_csv(all_filtered, base_directory):
     # Save the filtered data to the CSV file in the "Results" folder
     filtered_data.to_csv(csv_file_name, index=False,header=False, encoding="utf-8")
 
+def is_number(variable):
+    return isinstance(variable, (int, float, complex))
+
 def combine_sku_and_quantity(all_filtered):
     # Create empty lists to store the combined SKU and Quantity strings
     combined_sku_values = []
@@ -68,7 +71,10 @@ def combine_sku_and_quantity(all_filtered):
     # Iterate through each row in the DataFrame
     for index, row in all_filtered.iterrows():
         sku_values = row['SKU'].split(',')
-        quantity_values = row['Quantity'].split(',')
+        if is_number(row['Quantity']): 
+            quantity_values = [row['Quantity']]
+        else:
+            quantity_values = row['Quantity'].split(',')
 
         # Create an empty dictionary to store the SKU and Quantity pairs for the current row
         sku_quantity_dict = {}
