@@ -66,6 +66,7 @@ def combine_sku_and_quantity(all_filtered):
     # Create empty lists to store the combined SKU and Quantity strings
     combined_sku_values = []
     combined_quantity_values = []
+    combined_phone_number_values = []
 
     # Iterate through each row in the DataFrame
     for index, row in all_filtered.iterrows():
@@ -88,9 +89,21 @@ def combine_sku_and_quantity(all_filtered):
         combined_sku_values.append(combined_sku)
         combined_quantity_values.append(combined_quantity)
 
+        # PHONE NUMBER LOGIC HERE
+
+        original_phone_number = str(row['Phone']).strip()
+        first_three_digits = original_phone_number[:3]
+        after_three_digits = original_phone_number[3:]
+        if first_three_digits == "600":
+            combined_phone_number_values.append("60" + after_three_digits)
+        else: 
+            combined_phone_number_values.append("60" + original_phone_number)
+            
+
     # Update the DataFrame with the combined SKU and Quantity values
     all_filtered['SKU'] = combined_sku_values
     all_filtered['Quantity'] = combined_quantity_values
+    all_filtered['Phone'] = combined_phone_number_values
 
 
 def main():
