@@ -61,20 +61,21 @@ def save_to_csv(all_filtered, base_directory):
     filtered_data.to_csv(csv_file_name, index=False,header=False, encoding="utf-8")
 
 def combine_sku_and_quantity(all_filtered):
-    sku_quantity_dict = {}  # Create a dictionary to store SKU and cumulative quantity
+    sku_values = all_filtered['SKU'].split(',')
+    quantity_values = all_filtered['Quantity'].split(',')
 
-    for index, row in all_filtered.iterrows():
-        sku = row['SKU']
-        quantity = row['Quantity']
-        
-        if sku in sku_quantity_dict:
-            sku_quantity_dict[sku] += quantity
-        else:
-            sku_quantity_dict[sku] = quantity
+    # Create an empty dictionary to store the SKU and Quantity pairs
+    sku_quantity_dict = {}
 
-    # Update the SKU and Quantity columns with combined values
-    all_filtered['SKU'] = all_filtered['SKU'] + '-' + all_filtered['SKU'].map(sku_quantity_dict).astype(str)
-    all_filtered['Quantity'] = all_filtered['SKU'].map(sku_quantity_dict)
+    # Iterate through the indices and combine SKU and Quantity
+    for index in range(len(sku_values)):
+        sku = sku_values[index].strip()  # Remove leading/trailing spaces
+        quantity = int(quantity_values[index].strip())  # Convert quantity to an integer
+        sku_quantity_dict[sku] = quantity  
+
+    all_filtered["SKU"] = ",".join([f"{key}-{value}" for key, value in sku_quantity_dict.items()])
+    all_filtered["Quantity"] = ",".join(map(str, sku_quantity_dict.values()))
+
 
 def main():
     base_directory = get_base_directory()
