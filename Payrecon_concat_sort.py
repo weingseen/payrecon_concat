@@ -21,9 +21,9 @@ def combine_xlsx_files_and_cleanup(base_directory):
     # Create the dataframe by concatenating XLSX files
     all_data = pd.concat([pd.read_excel(file, header=1) for file in files])
 
-    # Remove the original XLSX files
-    for file in files:
-        os.remove(file)
+    # # Remove the original XLSX files
+    # for file in files:
+    #     os.remove(file)
 
     # Perform data cleanup and sorting
     all_filtered = all_data.loc[all_data['Shipping Information'].str.contains('others|seller|non-shopee', flags=re.I, regex=True, na=False)].sort_values(by=["Seller ID"], ascending=True)
@@ -60,8 +60,7 @@ def save_to_csv(all_filtered, base_directory):
     # Save the filtered data to the CSV file in the "Results" folder
     filtered_data.to_csv(csv_file_name, index=False,header=False, encoding="utf-8")
 
-def is_number(variable):
-    return isinstance(variable, (int, float, complex))
+
 
 def combine_sku_and_quantity(all_filtered):
     # Create empty lists to store the combined SKU and Quantity strings
@@ -71,10 +70,8 @@ def combine_sku_and_quantity(all_filtered):
     # Iterate through each row in the DataFrame
     for index, row in all_filtered.iterrows():
         sku_values = row['SKU'].split(',')
-        if is_number(row['Quantity']): 
-            quantity_values = [row['Quantity']]
-        else:
-            quantity_values = row['Quantity'].split(',')
+        quantity_values = str(row['Quantity']).split(',')
+         
 
         # Create an empty dictionary to store the SKU and Quantity pairs for the current row
         sku_quantity_dict = {}
@@ -83,10 +80,10 @@ def combine_sku_and_quantity(all_filtered):
         for i in range(len(sku_values)):
             sku = sku_values[i].strip()  # Remove leading/trailing spaces
             quantity = int(quantity_values[i].strip())  # Convert quantity to an integer
-            sku_quantity_dict[sku] =   sku_quantity_dict.get(sku, 0) + quantity
+            sku_quantity_dict[sku] =  sku_quantity_dict.get(sku, 0) + quantity
 
         # Join SKU and Quantity for the current row and append to the lists
-        combined_sku = ",".join([f"{key}-{value}" for key, value in sku_quantity_dict.items()])
+        combined_sku = ",".join([f"{key}" for key, value in sku_quantity_dict.items()])
         combined_quantity = ",".join(map(str, sku_quantity_dict.values()))
         combined_sku_values.append(combined_sku)
         combined_quantity_values.append(combined_quantity)
